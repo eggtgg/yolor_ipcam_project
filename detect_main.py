@@ -9,6 +9,7 @@ import shutil
 import time
 from pathlib import Path
 
+import firebase
 import cv2
 import torch
 import numpy as np
@@ -124,7 +125,8 @@ def detect(save_img=False):
                     if names[int(c)] == 'person':
                         frame60.append(int(n))
                     if len(frame60) == 10:
-                        persons_per_second = sum(frame60)/10
+                        persons_per_second = int(sum(frame60)/10)
+                        firebase.sendata(persons_per_second)
                         if persons_per_second > 1:
                             print('bat den len')
                             frame60 = []
@@ -144,6 +146,15 @@ def detect(save_img=False):
                         plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=3)
             else:
                 frame60.append(0)
+                if len(frame60) == 10:
+                    persons_per_second = int(sum(frame60) / 10)
+                    firebase.sendata(persons_per_second)
+                    if persons_per_second > 1:
+                        print('bat den len')
+                        frame60 = []
+                    else:
+                        print('tat den di')
+                        frame60 = []
 
             # Print time (inference + NMS)
             print('%sDone. (%.3fs)' % (s, t2 - t1))
